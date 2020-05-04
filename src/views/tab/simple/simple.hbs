@@ -39,6 +39,7 @@
         <!-- Login button -->
         <button onclick="loginV1()">Login to Azure AD</button>
         <button onclick="loginV2()">Login to Azure AD (V2 endpoint)</button>
+        <button onclick="loginLocal()">Login to Local App</button>
 
         <!-- Result -->
         <p>
@@ -72,7 +73,7 @@
 
                         let data = localStorage.getItem(result);
                         localStorage.removeItem(result);
-                        
+
                         let tokenResult = JSON.parse(data);
                         getUserProfile(tokenResult.accessToken);
                     },
@@ -90,6 +91,38 @@
             function loginV2() {
                 login(window.location.origin + "/tab/simple-start-v2");
             }
+
+            function loginLocal() {
+                hideProfileAndError(); 
+
+                microsoftTeams.authentication.authenticate({
+                    url: 'window.location.origin + "/tab/simple-start-local"',
+                    width: 600,
+                    height: 535,
+                    successCallback: function (result) {
+                        console.log("Login succeeded: " + result);
+
+                        let data = localStorage.getItem(result);
+                        localStorage.removeItem(result);
+
+                        let tokenResult = JSON.parse(data);
+                        getUserProfileLocal(tokenResult.accessToken);
+                        /* getUserProfile(tokenResult.accessToken); */
+                    },
+                    failureCallback: function (reason) {
+                        console.log("Login failed: " + reason);
+                        handleAuthError(reason);
+                    }
+                });
+            }
+
+         function getUserProfileLocal(accessToken) {
+             $("#profileDisplayName").text('fakedDisplayName');
+             $("#profileJobTitle").text('fakedTitle');
+             $("#profileMail").text('fakedEmail');
+             $("#divProfile").css({ display: "" });
+             $("#divError").css({ display: "none" });
+         }
 
             // Get the user's profile information from Microsoft Graph
             function getUserProfile(accessToken) {
